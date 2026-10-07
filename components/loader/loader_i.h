@@ -1,0 +1,85 @@
+#pragma once
+#include <furi.h>
+#include <api_lock.h>
+
+#include <gui.h>
+#include <view_holder.h>
+#include <loading.h>
+
+#include "loader.h"
+#include "loader_menu.h"
+#include "loader_applications.h"
+
+typedef struct FlipperApplication FlipperApplication;
+
+typedef struct {
+    char* args;
+    FuriThread* thread;
+    FlipperApplication* fap;
+    bool insomniac;
+} LoaderAppData;
+
+struct Loader {
+    FuriPubSub* pubsub;
+    FuriPubSub* input_events;
+    FuriPubSubSubscription* input_subscription;
+    FuriMessageQueue* queue;
+    LoaderMenu* loader_menu;
+    LoaderApplications* loader_applications;
+    LoaderAppData app;
+
+    Gui* gui;
+    ViewHolder* view_holder;
+    Loading* loading;
+
+    char* pending_name;
+    char* pending_args;
+};
+
+typedef enum {
+    LoaderMessageTypeStartByName,
+    LoaderMessageTypeAppClosed,
+    LoaderMessageTypeShowMenu,
+    LoaderMessageTypeShowSettings,
+    LoaderMessageTypeMenuClosed,
+    LoaderMessageTypeApplicationsClosed,
+    LoaderMessageTypeLock,
+    LoaderMessageTypeUnlock,
+    LoaderMessageTypeIsLocked,
+    LoaderMessageTypeSignal,
+    LoaderMessageTypeStartByNameDetachedWithGuiError,
+} LoaderMessageType;
+
+typedef struct {
+    const char* name;
+    const char* args;
+    FuriString* error_message;
+} LoaderMessageStartByName;
+
+typedef struct {
+    LoaderStatus value;
+} LoaderMessageLoaderStatusResult;
+
+typedef struct {
+    bool value;
+} LoaderMessageBoolResult;
+
+typedef struct {
+    uint32_t signal;
+    void* arg;
+} LoaderMessageSignal;
+
+typedef struct {
+    FuriApiLock api_lock;
+    LoaderMessageType type;
+
+    union {
+        LoaderMessageStartByName start;
+        LoaderMessageSignal signal;
+    };
+
+    union {
+        LoaderMessageLoaderStatusResult* status_value;
+        LoaderMessageBoolResult* bool_value;
+    };
+} LoaderMessage;

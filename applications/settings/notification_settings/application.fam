@@ -1,0 +1,9 @@
+App(
+    appid="notification_settings",
+    name="声音显示",
+    apptype=FlipperAppType.SETTINGS,
+    entry_point="notification_settings_app",
+    requires=["notification"],
+    stack_size=1 * 1024,
+    order=70,
+)

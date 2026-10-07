@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS
+        "loader.c"
+        "loader_menu.c"
+        "loader_applications.c"
+        "menu_custom.c"
+        "apps/about_app.c"
+    INCLUDE_DIRS "."
+    REQUIRES furi gui input toolbox assets storage archive dialogs flipper_application
+)
